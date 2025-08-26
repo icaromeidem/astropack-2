@@ -1,0 +1,6 @@
+Metadata-Version: 2.1
+Name: astropack2
+Version: 1.0.0
+Summary: Versão otimizada do Astropack (cordeirossauro/astropack) para filtros do J-PAS
+Author: icaromeidem
+Requires-Python: >=3.7

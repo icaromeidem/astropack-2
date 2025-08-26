@@ -2,7 +2,7 @@ import gc
 import numpy as np
 import pandas as pd
 
-from astropack.preprocess import calculate_abs_mag, assemble_work_df
+from astropack2.preprocess import calculate_abs_mag, assemble_work_df
 
 class Predictor:
     def __init__(self, id_col, mag_cols, err_cols, dist_col, correction_pairs, models, mc_reps):

@@ -4,10 +4,7 @@ from . import tuning
 from . import models
 from . import evaluation
 
-# Importa lista de filtros do JPAS
-from .preprocess.filters import JPAS_FILTERS
-
-# Sets of filters and corrections used
+# Filter definitions for astropack2
 FILTERS = {
     "JPLUS": [
         "uJAVA", "J0378", "J0395", "J0410", "J0430", "gSDSS",
@@ -24,6 +21,16 @@ FILTERS = {
     "WISE": ["W1", "W2", "J", "H", "K"],
     "GALEX": ["NUVmag"],
     "GAIA": ["G", "BP", "RP"],
+}
+
+ERRORS = {
+    "JPLUS": [f"{x}_err" for x in FILTERS["JPLUS"]],
+    "JPAS": [f"{x}_err" for x in FILTERS["JPAS"]],
+}
+
+CORRECTIONS = {
+    "JPLUS": [f"Ax_{x}" for x in FILTERS["JPLUS"]],
+    "JPAS": [f"Ax_{x}" for x in FILTERS["JPAS"]],
 }
 
 ERRORS = {

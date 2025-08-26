@@ -4,7 +4,7 @@ from sklearn.metrics import f1_score, recall_score, precision_score
 import time
 import numpy as np
 import pandas as pd
-from astropack.models import create_model
+from astropack2.models import create_model
 
 
 class Tuner:
