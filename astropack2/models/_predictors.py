@@ -23,7 +23,7 @@ class Predictor:
         if self.dist_col and self.dist_col in input_data.columns:
             input_data = calculate_abs_mag(input_data, self.mag_cols, self.dist_col)
 
-        input_data.set_index(self.id_col, drop=True, inplace=True)
+        # input_data.set_index(self.id_col, drop=True, inplace=True)
 
         work_df = assemble_work_df(
             df=input_data,
