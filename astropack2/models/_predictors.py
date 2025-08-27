@@ -91,9 +91,15 @@ class Predictor:
                         verbose=False,
                     )
 
-                    if "Classifier" in str(type(pipeline[-1])):
+                    # Detecta se é pipeline (list, tuple, sklearn Pipeline) ou estimador direto
+                    if hasattr(pipeline, '__getitem__') and not isinstance(pipeline, str):
+                        model_obj = pipeline[-1]
+                    else:
+                        model_obj = pipeline
+
+                    if "Classifier" in str(type(model_obj)):
                         batch_predictions[i] = [x[1] for x in pipeline.predict_proba(mc_work_df)]
-                    elif "Regressor" in str(type(pipeline[-1])):
+                    elif "Regressor" in str(type(model_obj)):
                         batch_predictions[i] = pipeline.predict(mc_work_df)
 
                     # Limpar memória intermediária
