@@ -5,7 +5,7 @@ import pandas as pd
 from astropack2.preprocess import calculate_abs_mag, assemble_work_df
 
 class Predictor:
-    def __init__(self, id_col, mag_cols, err_cols, dist_col, correction_pairs, models, mc_reps):
+    def __init__(self, id_col, mag_cols, err_cols, dist_col, correction_pairs, models, mc_reps, batch_partitions=20):
         self.id_col = id_col
         self.mag_cols = mag_cols
         self.err_cols = err_cols
@@ -13,6 +13,7 @@ class Predictor:
         self.correction_pairs = correction_pairs
         self.models = models
         self.mc_reps = mc_reps
+        self.batch_partitions = batch_partitions
 
     def predict_parameters(self, args):
         input_data, output_path, keep_cols, save_mode, header = args
@@ -40,6 +41,7 @@ class Predictor:
         )
 
 
+
         for model_name in self.models:
             pipeline = self.models[model_name]
 
@@ -49,14 +51,20 @@ class Predictor:
             m2 = None
             std_dev = None
 
-            if "Classifier" in str(type(pipeline[-1])):
+            # Detecta se é pipeline (list, tuple, sklearn Pipeline) ou estimador direto
+            if hasattr(pipeline, '__getitem__') and not isinstance(pipeline, str):
+                model_obj = pipeline[-1]
+            else:
+                model_obj = pipeline
+
+            if "Classifier" in str(type(model_obj)):
                 true_predictions = pipeline.predict_proba(work_df)
                 true_predictions = [x[1] for x in true_predictions]
-            elif "Regressor" in str(type(pipeline[-1])):
+            elif "Regressor" in str(type(model_obj)):
                 true_predictions = pipeline.predict(work_df)
 
             # Processar MC em mini-batches para economizar memória
-            mc_batch_size = 20  # Processar 20 iterações por vez
+            mc_batch_size = self.batch_partitions  # Definido pelo usuário na criação do Predictor
             for batch_start in range(0, self.mc_reps, mc_batch_size):
                 batch_end = min(batch_start + mc_batch_size, self.mc_reps)
                 batch_size = batch_end - batch_start
