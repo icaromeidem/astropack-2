@@ -6,11 +6,11 @@ import numpy as np
 
 from math import log10, floor
 
-label_fontdict = {"family": "sans-serif", "weight": "normal", "size": 24}
+label_fontdict = {"family": "sans-serif", "weight": "normal", "size": 10}
 
-legend_label_fontdict = {"family": "sans-serif", "weight": "normal", "size": 18}
+legend_label_fontdict = {"family": "sans-serif", "weight": "normal", "size": 10}
 
-legend_title_fontdict = {"family": "sans-serif", "weight": "bold", "size": 20}
+legend_title_fontdict = {"family": "sans-serif", "weight": "bold", "size": 10}
 
 tick_size = 20
 
@@ -203,3 +203,134 @@ def round_to_n(x, n):
 def plot_handles(ax, m, c):
     handle = ax.plot([], [], marker=m, color=c, ls="None")[0]
     return handle
+
+
+def plot_regression_with_residuals(y_true, y_pred, bins=None, param_name=None, param_unit=None, cmap=None, point_size=3):
+    """
+    Gera um gráfico padrão para avaliação de regressão:
+    - Painel principal: dispersão y_pred vs y_true, linha de identidade, R² e MAD.
+    - Painel superior: resíduos vs y_true, linhas de ±3σ e porcentagem de objetos dentro desse intervalo.
+    - Suporte a coloração por bins ou contínua.
+    """
+    import matplotlib.pyplot as plt
+    import numpy as np
+    import matplotlib.colors as mcolors
+    import matplotlib.cm as cm
+
+    # Detectar parâmetro e ajustar padrões
+    param_map = {
+        'teff': {
+            'name': 'Teff',
+            'unit': 'K',
+            'cmap': 'Reds',
+            'xlabel': 'Teff True (K)',
+            'ylabel': 'Teff Predicted (K)'
+        },
+        'feh': {
+            'name': '[Fe/H]',
+            'unit': 'dex',
+            'cmap': 'Blues',
+            'xlabel': '[Fe/H] True (dex)',
+            'ylabel': '[Fe/H] Predicted (dex)'
+        },
+        'logg': {
+            'name': 'logg',
+            'unit': 'dex',
+            'cmap': 'Greens',
+            'xlabel': 'logg True (dex)',
+            'ylabel': 'logg Predicted (dex)'
+        }
+    }
+
+    # Detectar param automaticamente
+    param_key = None
+    if param_name is not None:
+        pname = param_name.strip().lower().replace('[', '').replace(']', '').replace('/', '').replace(' ', '')
+        if 'teff' in pname:
+            param_key = 'teff'
+        elif 'feh' in pname or 'feh' in pname.replace('[', '').replace(']', '').replace('/', '').replace(' ', ''):
+            param_key = 'feh'
+        elif 'logg' in pname:
+            param_key = 'logg'
+
+    if param_key in param_map:
+        pinfo = param_map[param_key]
+    else:
+        # fallback para Teff
+        pinfo = param_map['teff']
+
+    # Sobrescrever argumentos se não definidos
+    if param_unit == "K" or param_unit is None:
+        param_unit = pinfo['unit']
+    if cmap == "Reds" or cmap is None:
+        cmap = pinfo['cmap']
+    # Labels
+    xlabel = pinfo['xlabel']
+    ylabel = pinfo['ylabel']
+
+    y_true = np.array(y_true)
+    y_pred = np.array(y_pred)
+    residuals = y_pred - y_true
+    sigma = np.std(residuals)
+    mad = np.median(np.abs(residuals))
+    # R² Score
+    try:
+        from sklearn.metrics import r2_score
+        r2 = r2_score(y_true, y_pred)
+    except ImportError:
+        r2 = np.corrcoef(y_true, y_pred)[0, 1] ** 2
+
+    fig = plt.figure(figsize=(8, 8))
+    gs = fig.add_gridspec(2, 1, height_ratios=[1, 4], hspace=0.05)
+
+    # Painel de resíduos
+    ax_res = fig.add_subplot(gs[0])
+    if bins is not None:
+        c = np.digitize(y_true, bins)
+        sc_res = ax_res.scatter(y_true, residuals, c=c, cmap=cmap, s=point_size, alpha=0.7)
+    else:
+        sc_res = ax_res.scatter(y_true, residuals, c=y_true, cmap=cmap, s=point_size, alpha=0.7)
+    ax_res.axhline(0, color='k', linestyle='--', linewidth=1)
+    ax_res.axhline(3*sigma, color='k', linestyle='--', linewidth=1)
+    ax_res.axhline(-3*sigma, color='k', linestyle='--', linewidth=1)
+    ax_res.set_ylabel("Residuals")
+    ax_res.set_xticks([])
+    # Criar handle manualmente apenas para a linha tracejada (--- ±3σ)
+    from matplotlib.lines import Line2D
+    line_handle = Line2D([0], [0], color='k', linestyle='--', linewidth=1)
+    ax_res.legend([line_handle], ["±3σ"], loc="lower left", fontsize=8)
+
+    # Painel principal
+    ax_main = fig.add_subplot(gs[1])
+    if bins is not None:
+        c = np.digitize(y_true, bins)
+        sc = ax_main.scatter(y_true, y_pred, c=c, cmap=cmap, s=point_size, alpha=0.7)
+        # Adiciona colorbar com os intervalos
+        cmap_obj = cm.get_cmap(cmap)
+        n_colors = getattr(cmap_obj, 'N', 256)
+        norm = mcolors.BoundaryNorm(bins, n_colors)
+        sm = cm.ScalarMappable(norm=norm, cmap=cmap_obj)
+        sm.set_array([])
+        cbar = fig.colorbar(
+            sm,
+            ax=ax_main,
+            orientation='vertical',
+            pad=0.02,
+            aspect=60
+        )
+        if bins is not None and len(bins) > 1:
+            tick_locs = [(bins[i]+bins[i+1])/2 for i in range(len(bins)-1)]
+            cbar.set_ticks(tick_locs)
+            cbar.ax.set_yticklabels([f"[{bins[i]}, {bins[i+1]})" for i in range(len(bins)-1)])
+        cbar.set_label(f"{pinfo['name']} intervals ({pinfo['unit']})", fontsize=10)
+    else:
+        sc = ax_main.scatter(y_true, y_pred, c=y_true, cmap=cmap, s=point_size, alpha=0.7)
+    minv, maxv = min(y_true.min(), y_pred.min()), max(y_true.max(), y_pred.max())
+    ax_main.plot([minv, maxv], [minv, maxv], 'k-', lw=1)
+    ax_main.set_xlabel(xlabel)
+    ax_main.set_ylabel(ylabel)
+    ax_main.text(0.05, 0.95, f"R² Score: {r2:.4f}", transform=ax_main.transAxes, fontsize=9, va='top')
+    ax_main.text(0.95, 0.05, f"MAD: {mad:.2f} {pinfo['unit']}", transform=ax_main.transAxes, fontsize=9, ha='right', va='bottom')
+
+    plt.tight_layout()
+    return fig

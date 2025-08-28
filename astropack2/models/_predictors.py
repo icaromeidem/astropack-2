@@ -5,7 +5,7 @@ import pandas as pd
 from astropack2.preprocess import calculate_abs_mag, assemble_work_df
 
 class Predictor:
-    def __init__(self, id_col, mag_cols, err_cols, dist_col, correction_pairs, models, mc_reps, batch_partitions=20):
+    def __init__(self, id_col, mag_cols, err_cols, dist_col, correction_pairs, models, mc_reps):
         self.id_col = id_col
         self.mag_cols = mag_cols
         self.err_cols = err_cols
