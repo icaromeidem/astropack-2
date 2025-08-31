@@ -1,3 +1,22 @@
+def load_model_pipeline(model_type, path):
+    """
+    Carrega um modelo treinado do tipo XGB (.json) ou RF (.sav) conforme o tipo informado.
+    model_type: 'XGB' ou 'RF'
+    path: caminho do arquivo do modelo
+    """
+    if model_type == 'XGB':
+        try:
+            from xgboost import XGBRegressor
+        except ImportError:
+            raise ImportError('xgboost não está instalado.')
+        model = XGBRegressor()
+        model.load_model(path)
+        return model
+    elif model_type == 'RF':
+        import joblib
+        return joblib.load(open(path, 'rb'))
+    else:
+        raise ValueError('Tipo de modelo não suportado: use "XGB" ou "RF"')
 import gc
 import numpy as np
 import pandas as pd
@@ -5,7 +24,7 @@ import pandas as pd
 from astropack2.preprocess import calculate_abs_mag, assemble_work_df
 
 class Predictor:
-    def __init__(self, id_col, mag_cols, err_cols, dist_col, correction_pairs, models, mc_reps):
+    def __init__(self, id_col, mag_cols, err_cols, dist_col, correction_pairs, models, mc_reps, batch_partitions):
         self.id_col = id_col
         self.mag_cols = mag_cols
         self.err_cols = err_cols
