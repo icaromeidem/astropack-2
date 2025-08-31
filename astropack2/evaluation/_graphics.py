@@ -285,11 +285,23 @@ def plot_regression_with_residuals(y_true, y_pred, bins=None, param_name=None, p
 
     # Painel de resíduos
     ax_res = fig.add_subplot(gs[0])
+    # Custom colormap: start from gray instead of white
+    import matplotlib.colors as mcolors
+    import matplotlib.cm as cm
+    base_cmap = cm.get_cmap(cmap)
+    # Create a new colormap that starts from gray (e.g., #cccccc)
+    from matplotlib.colors import LinearSegmentedColormap
+    gray_rgb = mcolors.to_rgb('#cccccc')
+    # Blend gray with the original colormap
+    new_colors = [gray_rgb] + [base_cmap(i) for i in np.linspace(0.15, 1, 255)]
+    custom_cmap = LinearSegmentedColormap.from_list(f"gray_{cmap}", new_colors)
     if bins is not None:
         c = np.digitize(y_true, bins)
-        sc_res = ax_res.scatter(y_true, residuals, c=c, cmap=cmap, s=point_size, alpha=0.7)
+        sc_res = ax_res.scatter(y_true, residuals, c=c, cmap=custom_cmap, s=point_size, alpha=0.7)
     else:
-        sc_res = ax_res.scatter(y_true, residuals, c=y_true, cmap=cmap, s=point_size, alpha=0.7)
+        sc_res = ax_res.scatter(y_true, residuals, c=y_true, cmap=custom_cmap, s=point_size, alpha=0.7)
+    # Fundo branco
+    ax_res.set_facecolor("#ffffff")
     ax_res.axhline(0, color='k', linestyle='--', linewidth=1)
     ax_res.axhline(3*sigma, color='k', linestyle='--', linewidth=1)
     ax_res.axhline(-3*sigma, color='k', linestyle='--', linewidth=1)
@@ -304,9 +316,9 @@ def plot_regression_with_residuals(y_true, y_pred, bins=None, param_name=None, p
     ax_main = fig.add_subplot(gs[1])
     if bins is not None:
         c = np.digitize(y_true, bins)
-        sc = ax_main.scatter(y_true, y_pred, c=c, cmap=cmap, s=point_size, alpha=0.7)
+        sc = ax_main.scatter(y_true, y_pred, c=c, cmap=custom_cmap, s=point_size, alpha=0.7)
         # Adiciona colorbar com os intervalos
-        cmap_obj = cm.get_cmap(cmap)
+        cmap_obj = custom_cmap
         n_colors = getattr(cmap_obj, 'N', 256)
         norm = mcolors.BoundaryNorm(bins, n_colors)
         sm = cm.ScalarMappable(norm=norm, cmap=cmap_obj)
@@ -324,13 +336,20 @@ def plot_regression_with_residuals(y_true, y_pred, bins=None, param_name=None, p
             cbar.ax.set_yticklabels([f"[{bins[i]}, {bins[i+1]})" for i in range(len(bins)-1)])
         cbar.set_label(f"{pinfo['name']} intervals ({pinfo['unit']})", fontsize=10)
     else:
-        sc = ax_main.scatter(y_true, y_pred, c=y_true, cmap=cmap, s=point_size, alpha=0.7)
+        sc = ax_main.scatter(y_true, y_pred, c=y_true, cmap=custom_cmap, s=point_size, alpha=0.7)
+    # Fundo branco
+    ax_main.set_facecolor('#ffffff')
+    # Sem grades no painel principal
     minv, maxv = min(y_true.min(), y_pred.min()), max(y_true.max(), y_pred.max())
-    ax_main.plot([minv, maxv], [minv, maxv], 'k-', lw=1)
+    # Linha de identidade e scatter com zorder maior que o grid
+    ax_main.plot([minv, maxv], [minv, maxv], 'k-', lw=1, zorder=2)
+    # Atualizar zorder do scatter
+    for coll in ax_main.collections:
+        coll.set_zorder(1)
     ax_main.set_xlabel(xlabel)
     ax_main.set_ylabel(ylabel)
     ax_main.text(0.05, 0.95, f"R² Score: {r2:.4f}", transform=ax_main.transAxes, fontsize=9, va='top')
     ax_main.text(0.95, 0.05, f"MAD: {mad:.2f} {pinfo['unit']}", transform=ax_main.transAxes, fontsize=9, ha='right', va='bottom')
 
-    plt.tight_layout()
+    # Não usar tight_layout para evitar warnings
     return fig
