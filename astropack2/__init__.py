@@ -5,13 +5,6 @@ from . import models
 from . import evaluation
 from .tuning import hyperparameter_search
 
-PARAM_ALIASES = {
-    'teff': ['teff', 'Teff', 'TEFF', 'TEFF_ADOP', 'TEFF_SPEC', 'T_EFF', 'teff_2'],
-    'logg': ['logg', 'Logg', 'LOGG', 'log g', 'logg_2'],
-    'feh': ['feh', 'Feh', 'FEH', '[Fe/H]', '[M/H]', 'feh_2', '[M/H]_2'],
-}
-
-
 # Filter definitions for astropack2
 FILTERS = {
     "JPLUS": [
