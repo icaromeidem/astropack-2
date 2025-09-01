@@ -1,1 +1,1 @@
-from ._tuner import Tuner
+from ._tuner import hyperparameter_search

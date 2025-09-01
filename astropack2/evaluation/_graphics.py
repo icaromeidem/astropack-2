@@ -205,13 +205,20 @@ def plot_handles(ax, m, c):
     return handle
 
 
-def plot_regression_with_residuals(y_true, y_pred, bins=None, param_name=None, param_unit=None, cmap=None, point_size=3):
+def plot_regression_with_residuals(
+    y_true, y_pred, bins=None, param_name=None, param_unit=None, cmap=None, point_size=3,
+    metrics_json_path=None, training_id=None
+):
     """
     Gera um gráfico padrão para avaliação de regressão:
     - Painel principal: dispersão y_pred vs y_true, linha de identidade, R² e MAD.
     - Painel superior: resíduos vs y_true, linhas de ±3σ e porcentagem de objetos dentro desse intervalo.
     - Suporte a coloração por bins ou contínua.
+    - Se metrics_json_path for fornecido, lê as métricas do arquivo JSON e exibe na legenda do gráfico.
+    - Se training_id for fornecido, exibe o ID do experimento na legenda.
     """
+    import os
+    import json
     import matplotlib.pyplot as plt
     import numpy as np
     import matplotlib.colors as mcolors
@@ -279,6 +286,19 @@ def plot_regression_with_residuals(y_true, y_pred, bins=None, param_name=None, p
         r2 = r2_score(y_true, y_pred)
     except ImportError:
         r2 = np.corrcoef(y_true, y_pred)[0, 1] ** 2
+
+    # Se metrics_json_path for fornecido e existir, ler métricas do JSON
+    metrics_str = None
+    if metrics_json_path is not None and os.path.exists(metrics_json_path):
+        try:
+            with open(metrics_json_path, 'r') as f:
+                metrics = json.load(f)
+            if training_id is not None:
+                metrics_str = f"R² = {metrics.get('r2', r2):.4f} | MAD = {metrics.get('mad', mad):.4f}"
+            else:
+                metrics_str = f"R² = {metrics.get('r2', r2):.4f} | MAD = {metrics.get('mad', mad):.4f}"
+        except Exception as e:
+            metrics_str = f"[Erro ao ler métricas do JSON: {e}]"
 
     fig = plt.figure(figsize=(8, 8))
     gs = fig.add_gridspec(2, 1, height_ratios=[1, 4], hspace=0.05)
@@ -348,8 +368,12 @@ def plot_regression_with_residuals(y_true, y_pred, bins=None, param_name=None, p
         coll.set_zorder(1)
     ax_main.set_xlabel(xlabel)
     ax_main.set_ylabel(ylabel)
-    ax_main.text(0.05, 0.95, f"R² Score: {r2:.4f}", transform=ax_main.transAxes, fontsize=9, va='top')
-    ax_main.text(0.95, 0.05, f"MAD: {mad:.2f} {pinfo['unit']}", transform=ax_main.transAxes, fontsize=9, ha='right', va='bottom')
+    # Exibir métricas do JSON na legenda, se disponível
+    if metrics_str is not None:
+        ax_main.legend([metrics_str], loc="upper left", fontsize=9, frameon=True)
+    else:
+        ax_main.text(0.05, 0.95, f"R² Score: {r2:.4f}", transform=ax_main.transAxes, fontsize=9, va='top')
+        ax_main.text(0.95, 0.05, f"MAD: {mad:.2f} {pinfo['unit']}", transform=ax_main.transAxes, fontsize=9, ha='right', va='bottom')
 
     # Não usar tight_layout para evitar warnings
     return fig
