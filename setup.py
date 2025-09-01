@@ -14,7 +14,6 @@ setup(
         "tqdm",
         "seaborn",
         "matplotlib"
-        # adicione outros pacotes necessários aqui
     ],
     python_requires=">=3.7",
 )

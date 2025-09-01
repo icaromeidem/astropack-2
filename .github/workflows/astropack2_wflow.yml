@@ -1,14 +1,10 @@
-name: Publish Python 🐍 distribution to PyPI with OIDC
 
+name: Publish Astropack 2
 on:
   push:
     branches:
       - main
   workflow_dispatch:
-
-permissions:
-  id-token: write  
-  contents: read
 
 jobs:
   build-and-publish:
@@ -31,7 +27,7 @@ jobs:
         run: |
           python -m build
 
-      - name: Publish to PyPI using OIDC
+      - name: Publish to PyPI using API token
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
-          skip-existing: true
+          password: ${{ secrets.PYPI_API_TOKEN }}
