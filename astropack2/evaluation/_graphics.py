@@ -1,18 +1,54 @@
 import matplotlib.pyplot as plt
-import matplotlib as mpl
-import seaborn as sns
-import pandas as pd
-import numpy as np
+
 
 from math import log10, floor
 
 label_fontdict = {"family": "sans-serif", "weight": "normal", "size": 10}
-
 legend_label_fontdict = {"family": "sans-serif", "weight": "normal", "size": 10}
-
 legend_title_fontdict = {"family": "sans-serif", "weight": "bold", "size": 10}
 
-tick_size = 20
+tick_size = 10
+
+def plot_feature_importance(df_feat, param, figsize=(8, 6), n_top_features=10):
+    """
+    Plota gráfico horizontal de importância das features.
+    Eixo X: importância, Eixo Y: feature.
+    Cores: vermelho (teff), verde (logg), azul (feh).
+    n_top_features: número de features mais importantes a exibir (default=10)
+    """
+    import matplotlib.cm as cm
+    import numpy as np
+    # Seleciona as n_top_features mais importantes
+    df_plot = df_feat.sort_values('importance', ascending=False).head(n_top_features)
+    features = df_plot['feature']
+    importances = df_plot['importance']
+    n = len(features)
+    cmap = cm.get_cmap('tab20', n)
+    colors = [cmap(i) for i in range(n)]
+    importances_pct = 100 * importances / importances.sum()
+    fig, ax = plt.subplots(figsize=figsize)
+    bars = ax.barh(features, importances_pct, color=colors)
+    ax.set_xlabel('Importance (%)', fontdict=label_fontdict)
+    ax.set_ylabel('')
+    ax.set_xlim(0, 100)
+    ax.set_xticks(np.linspace(0, 100, 11))
+    ax.tick_params(axis='x', labelsize=tick_size)
+    ax.tick_params(axis='y', labelsize=tick_size)
+    # Adiciona valores no final das barras
+    for bar, val in zip(bars, importances_pct):
+        ax.text(val + 1, bar.get_y() + bar.get_height()/2, f'{val:.1f}%', va='center', fontsize=tick_size-2)
+    # Adiciona o nome do parâmetro como texto no canto superior direito (sem caixa de legenda)
+    ax.text(
+        0.98, 0.98, str(param),
+        transform=ax.transAxes,
+        ha='right', va='top',
+        fontsize=label_fontdict['size']+2,
+        fontweight=label_fontdict['weight'] if 'weight' in label_fontdict else 'normal',
+        bbox=None
+    )
+    plt.tight_layout()
+    plt.show()
+
 
 def plot_test_graphs(
     predictions, true_values, bins, cmap_name, param_string, param_unit, n_ticks, legend
@@ -293,10 +329,11 @@ def plot_regression_with_residuals(
         try:
             with open(metrics_json_path, 'r') as f:
                 metrics = json.load(f)
+            mad_unit = pinfo['unit'] if 'unit' in pinfo else ''
             if training_id is not None:
-                metrics_str = f"R² = {metrics.get('r2', r2):.4f} | MAD = {metrics.get('mad', mad):.4f}"
+                metrics_str = f"R² = {metrics.get('r2', r2):.4f} | MAD = {metrics.get('mad', mad):.2f} {mad_unit}"
             else:
-                metrics_str = f"R² = {metrics.get('r2', r2):.4f} | MAD = {metrics.get('mad', mad):.4f}"
+                metrics_str = f"R² = {metrics.get('r2', r2):.4f} | MAD = {metrics.get('mad', mad):.2f} {mad_unit}"
         except Exception as e:
             metrics_str = f"[Erro ao ler métricas do JSON: {e}]"
 
