@@ -1,3 +1,7 @@
+#
+<p align="center">
+  <img src="logo/back_black.png" alt="MINAS logo" width="200"/>
+</p>
 
 # MINAS - Machine learning for INference with Astronomical Surveys
 
