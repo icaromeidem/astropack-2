@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "minas"
+version = "1.0.0"
+description = "MINAS - Machine learning for INference with Astronomical Surveys. Optimized version of Astropack (cordeirosauro/astropack) for astronomical surveys and new machine learning techniques"
+authors = [
+    {name = "icaromeidem"}
+]
+dependencies = [
+    "numpy",
+    "pandas",
+    "scikit-learn",
+    "joblib",
+    "tqdm",
+    "seaborn",
+    "matplotlib",
+    "xgboost"
+]
+requires-python = ">=3.7"

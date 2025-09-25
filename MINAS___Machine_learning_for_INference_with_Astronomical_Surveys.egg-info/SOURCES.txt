@@ -1,0 +1,17 @@
+setup.py
+MINAS___Machine_learning_for_INference_with_Astronomical_Surveys.egg-info/PKG-INFO
+MINAS___Machine_learning_for_INference_with_Astronomical_Surveys.egg-info/SOURCES.txt
+MINAS___Machine_learning_for_INference_with_Astronomical_Surveys.egg-info/dependency_links.txt
+MINAS___Machine_learning_for_INference_with_Astronomical_Surveys.egg-info/requires.txt
+MINAS___Machine_learning_for_INference_with_Astronomical_Surveys.egg-info/top_level.txt
+evaluation/__init__.py
+evaluation/_graphics.py
+evaluation/_metrics.py
+evaluation/feature_selection.py
+models/__init__.py
+models/_models.py
+models/_predictors.py
+preprocess/__init__.py
+preprocess/_functions.py
+tuning/__init__.py
+tuning/_tuner.py
