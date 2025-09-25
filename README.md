@@ -30,8 +30,7 @@ MINAS é uma versão otimizada e expandida do pacote Astropack (cordeirossauro/a
   Inicialização do pacote, definição de filtros reconhecidos, aliases de parâmetros e integração dos submódulos.
 - `setup.py` e `pyproject.toml`  
   Arquivos de configuração para instalação do pacote no modo moderno (PEP 517/518).
-- `.github/`  
-  Workflows de CI/CD e automações para testes e deploy.
+
 
 ### Como Usar
 
@@ -94,8 +93,7 @@ MINAS is an optimized and expanded version of the Astropack package (cordeirossa
   Package initialization, filter definitions, parameter aliases, and submodule integration.
 - `setup.py` and `pyproject.toml`  
   Configuration files for modern package installation (PEP 517/518).
-- `.github/`  
-  CI/CD workflows and automations for testing and deployment.
+
 
 ### How to Use
 
