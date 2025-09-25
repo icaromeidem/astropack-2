@@ -56,6 +56,8 @@ Pull requests e sugestões são bem-vindos! Siga o padrão de modularidade e doc
 
 ### Autor
 - Icaro Meidem
+- Contato: icarosilva@on.br
+
 
 ---
 
@@ -118,6 +120,7 @@ Pull requests and suggestions are welcome! Please follow the package's modularit
 
 ### Author
 - Icaro Meidem
+- Contact: icarosilva@on.br
 
 ---
 
