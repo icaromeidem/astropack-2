@@ -5,6 +5,67 @@
 
 # MINAS - Machine learning for INference with Astronomical Surveys
 
+## English
+
+MINAS is an optimized and expanded version of the Astropack package (cordeirossauro/astropack), designed to facilitate Machine Learning analyses in astronomical photometric surveys, especially with Random Forest and XGBoost, but with a flexible structure to incorporate other techniques.
+
+### Main Features
+- **Based on Astropack**: Leverages and expands the original package's features, with optimized and modular code.
+- **Focus on Random Forest and XGBoost**: Ready-to-use pipelines for classification and regression, but easily extensible to other algorithms.
+- **Automatic filter recognition**: Native support for filters from major photometric surveys such as J-PAS, J-PLUS, S-PLUS, GAIA, WISE, GALEX.
+- **Preprocessing, tuning, evaluation, and feature selection**: Integrated tools for the entire astronomical ML workflow.
+- **Modular structure**: Easy to adapt, extend, and integrate new methods or databases.
+
+### Folder Structure
+
+- `evaluation/`  
+  Tools for model evaluation, metrics, plots, and feature selection (e.g., permutation importance).
+- `models/`  
+  Implementation of Random Forest, XGBoost models, and utilities for ML pipelines.
+- `preprocess/`  
+  Functions for data preprocessing, catalog manipulation, normalization, missing value handling, etc.
+- `tuning/`  
+  Methods for hyperparameter search (grid search, random search) and pipeline integration.
+- `__init__.py`  
+  Package initialization, filter definitions, parameter aliases, and submodule integration.
+- `setup.py` and `pyproject.toml`  
+  Configuration files for modern package installation (PEP 517/518).
+
+
+### How to Use
+
+Install the package in editable mode:
+```bash
+pip install -e /path/to/minas
+```
+
+Import in your code:
+```python
+import minas as mg
+```
+
+Usage example:
+```python
+from minas.models import create_model
+model = create_model('RF-REG')
+```
+
+### Extensibility
+- You can add new ML algorithms by creating modules in `models/` and integrating them into the pipeline.
+- New filters or surveys can be added by editing the `FILTERS` dictionary in `__init__.py`.
+
+### Contribution
+Pull requests and suggestions are welcome! Please follow the package's modularity and documentation standards.
+
+### Author
+- Icaro Meidem
+- Contact: icarosilva@on.br
+
+---
+
+This package is distributed under the MIT license. For questions, open an issue in the repository.
+
+
 ## Português
 
 MINAS é uma versão otimizada e expandida do pacote Astropack (cordeirossauro/astropack), desenvolvida para facilitar análises de Machine Learning em levantamentos fotométricos astronômicos, especialmente com Random Forest e XGBoost, mas com estrutura flexível para incorporar outras técnicas.
@@ -67,63 +128,3 @@ Pull requests e sugestões são bem-vindos! Siga o padrão de modularidade e doc
 Este pacote é distribuído sob a licença MIT. Para dúvidas, abra uma issue no repositório.
 
 ---
-
-## English
-
-MINAS is an optimized and expanded version of the Astropack package (cordeirossauro/astropack), designed to facilitate Machine Learning analyses in astronomical photometric surveys, especially with Random Forest and XGBoost, but with a flexible structure to incorporate other techniques.
-
-### Main Features
-- **Based on Astropack**: Leverages and expands the original package's features, with optimized and modular code.
-- **Focus on Random Forest and XGBoost**: Ready-to-use pipelines for classification and regression, but easily extensible to other algorithms.
-- **Automatic filter recognition**: Native support for filters from major photometric surveys such as J-PAS, J-PLUS, S-PLUS, GAIA, WISE, GALEX.
-- **Preprocessing, tuning, evaluation, and feature selection**: Integrated tools for the entire astronomical ML workflow.
-- **Modular structure**: Easy to adapt, extend, and integrate new methods or databases.
-
-### Folder Structure
-
-- `evaluation/`  
-  Tools for model evaluation, metrics, plots, and feature selection (e.g., permutation importance).
-- `models/`  
-  Implementation of Random Forest, XGBoost models, and utilities for ML pipelines.
-- `preprocess/`  
-  Functions for data preprocessing, catalog manipulation, normalization, missing value handling, etc.
-- `tuning/`  
-  Methods for hyperparameter search (grid search, random search) and pipeline integration.
-- `__init__.py`  
-  Package initialization, filter definitions, parameter aliases, and submodule integration.
-- `setup.py` and `pyproject.toml`  
-  Configuration files for modern package installation (PEP 517/518).
-
-
-### How to Use
-
-Install the package in editable mode:
-```bash
-pip install -e /path/to/minas
-```
-
-Import in your code:
-```python
-import minas as mg
-```
-
-Usage example:
-```python
-from minas.models import create_model
-model = create_model('RF-REG')
-```
-
-### Extensibility
-- You can add new ML algorithms by creating modules in `models/` and integrating them into the pipeline.
-- New filters or surveys can be added by editing the `FILTERS` dictionary in `__init__.py`.
-
-### Contribution
-Pull requests and suggestions are welcome! Please follow the package's modularity and documentation standards.
-
-### Author
-- Icaro Meidem
-- Contact: icarosilva@on.br
-
----
-
-This package is distributed under the MIT license. For questions, open an issue in the repository.
